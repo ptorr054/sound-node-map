@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>2D Sound Node Map</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script>
+let nodes = [];
+let sounds = [];
+let isLoaded = false;
+
+function preload() {
+  for (let i = 0; i < 14; i++) {
+    const player = new Tone.Player({
+      url: `sounds/sound${i + 1}.mp3`,
+      autostart: false
+    }).toDestination();
+    sounds.push(player);
+  }
+  isLoaded = true;
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  const margin = 100;
+  for (let i = 0; i < 14; i++) {
+    let angle = map(i, 0, 14, 0, TWO_PI);
+    let radius = min(width, height) / 3;
+    let x = width / 2 + cos(angle) * radius;
+    let y = height / 2 + sin(angle) * radius;
+    nodes.push({ x, y, r: 20, index: i });
+  }
+}
+
+function draw() {
+  background(255);
+  fill(0);
+  noStroke();
+  for (let node of nodes) {
+    ellipse(node.x, node.y, node.r * 2);
+  }
+}
+
+function mousePressed() {
+  for (let node of nodes) {
+    let d = dist(mouseX, mouseY, node.x, node.y);
+    if (d < node.r) {
+      if (isLoaded) {
+        sounds[node.index].start();
+      }
+    }
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
